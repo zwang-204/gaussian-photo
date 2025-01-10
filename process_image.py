@@ -1,5 +1,3 @@
-import os
-import json
 import shutil
 import math
 import numpy as np
@@ -10,17 +8,12 @@ from PIL import Image
 from diffusers import MarigoldDepthPipeline
 
 def create_depth_map(image, output_path):
-    """
-    Generates a depth map using the Marigold model given a PIL Image object in memory.
-    Saves the depth map to disk, returning its path.
-    """
+    
     print("Generating depth map using Marigold model...")
     pipe = MarigoldDepthPipeline.from_pretrained("prs-eth/marigold-depth-lcm-v1-0")
 
-    # Run the pipeline directly on the PIL image (no need to open it again)
     depth = pipe(image)
 
-    # Save the depth map
     depth_16bit = pipe.image_processor.export_depth_to_16bit_png(depth.prediction)
     depth_path = Path(output_path) / "generated_depth.png"
     depth_16bit[0].save(depth_path)
@@ -33,21 +26,16 @@ def resize_image(img_path):
     image = Image.open(img_path).convert("RGB")
     width, height = image.size
     
-    # Determine the resizing scale
     scale = min(max_size / width, max_size / height)
     new_width = int(width * scale)
     new_height = int(height * scale)
     
-    # Resize the image in memory
     resized_image = image.resize((new_width, new_height))
     
     return resized_image, new_width, new_height
 
 def process_image(args):
-    if not args.output_path:
-        output_path = Path(args.img_path).parent
-    else:
-        output_path = Path(args.output_path)
+    output_path = Path(args.img_path).parent
     output_path.mkdir(exist_ok=True)
 
     images_path = output_path / "images"
@@ -73,7 +61,6 @@ def process_image(args):
 
     depth_map = Image.open(depth_map_path) if depth_map_path else None
 
-    # create black image
     black_img = Image.new("RGB", (width, height), (0, 0, 0))
     black_img.save(images_path / "black.jpg")
 
@@ -134,8 +121,6 @@ if __name__ == "__main__":
     parser.add_argument("--img_path", type=str, required=True)
     parser.add_argument("--depth_path", type=str, required=False, 
                         help="Optional path to depth map")
-    parser.add_argument("--output_path", type=str, required=False, 
-                        help="The default output directory is at the same level as the input image")
     parser.add_argument("--resize_size", type=int, required=False, default=600, 
                         help="Resizing to this pixel size")
     parser.add_argument("--depth_scale", type=float, required=False, default=1.0)
