@@ -69,5 +69,9 @@ python train.py -s <path to the directory of your image>
 ## Visualization
 For simplicity, it is recommended to test with a [Three.js renderer](https://github.com/mkkellogg/GaussianSplats3D).
 
-#### Some shader animations (to be updated)
+#### Some shader animations (to be published)
+![Bedroom](assets/gaussian_photo/bedroom.gif)
+![Street](assets/gaussian_photo/street.gif)
+![Train](assets/gaussian_photo/train.gif)
+
 
